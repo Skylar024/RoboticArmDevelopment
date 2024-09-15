@@ -41,7 +41,7 @@ sequence = [NINE, TWELVE, SIX, THREE]
 degrees = int(input("Enter degrees to turn: "))
 
 initSteps = 0
-DELAY = 10 #Delay set to 10ms because multiple motors in sequence get faster(this is to prevent motor chain from spinning into itself)
+DELAY = 2 #Delay set to 10ms because multiple motors in sequence get faster(this is to prevent motor chain from spinning into itself)
 steps = 0
 max_steps = math.ceil(degrees * 1.42222222)
 # 360° = 512
