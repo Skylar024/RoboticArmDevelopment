@@ -1,0 +1,5 @@
+Arm Measurements
+
+Bolt Thread Pitch = 1/32in = 0.79375mm
+Bolt Length(not including head) = 1/2in = 12.7mm
+Bolt Diameter(including threads) = 0.15625in = 3.96875mm
