@@ -3,10 +3,6 @@
 #     being moved once already. But still thinks that the arm is a 0,0,0 
 #     before moving the arm for a second time
 
-
-
-
-
 import utime
 from machine import Pin
 import math
