@@ -1,7 +1,9 @@
 # Known problems: 
-#     mAs system gets the correct angles needed to move arm after
-#     being moved once already. But still thinks that the arm is a 0,0,0 
-#     before moving the arm for a second time
+#     Fix arm not moving backwards when Target angle(tAs) is supposed to be negative
+# Improvements to be made:
+#     Find a way to increase the speed of the arm rotations
+#     Use Gears to increase torque of motor rotations so the arm can handle heavier arm segments
+#     
 
 import utime
 from machine import Pin
@@ -57,12 +59,25 @@ HALF_REVERSED = [[1,0,0,1],
 DELAY = 2
 steps = 0
 initSteps = 0
+
 w = 48 #Robotic Arm Length(Both)
 bcA = 0
 a1cA = 0
 a2cA = 0
 cAs = (bcA, a1cA, a2cA)
-
+def shutdownMotors():
+    pinA1.low()
+    pinB1.low()
+    pinC1.low()
+    pinD1.low()
+    pinA2.low()
+    pinB2.low()
+    pinC2.low()
+    pinD2.low()
+    pinA3.low()
+    pinB3.low()
+    pinC3.low()
+    pinD3.low()
 
 def moveToPos(x,y,z,phaseMode,DELAY,Pins1,Pins2,Pins3,cAs):
     mAs = (0,0,0)
@@ -79,13 +94,13 @@ def moveToPos(x,y,z,phaseMode,DELAY,Pins1,Pins2,Pins3,cAs):
     b = math.floor(b)
     a1 = math.floor(a1)
     a2 = math.floor(a2)
-    #Inverse a2 angle(May need to remove this when testing the arm)
+    #Inverse a2 angle(May need to remove this when testing the arm or reversing direction of motor)
     if (a2 < 0):
         a2 = abs(a2)
         
     
     tAs = (b, a1, a2)
-    print("tAs: ", tAs)
+    print("\ntAs: ", tAs)
     #Base mA
     if(b < 0 and cAs[0] < 0):
         bmA = (abs(cAs[0] - b))
@@ -113,10 +128,10 @@ def moveToPos(x,y,z,phaseMode,DELAY,Pins1,Pins2,Pins3,cAs):
     mAs = (bmA, a1mA, a2mA)
     
     print("mAs: ", mAs)
-    reallyMoveToAngleAll(b,a1,a2,phaseMode,DELAY,Pins,mAs)
-    return (mAs)
+    reallyMoveToAngleAll(phaseMode,DELAY,Pins,mAs)
+    return (tAs)
 
-def reallyMoveToAngleAll(b,a1,a2,phaseMode,DELAY,Pins,tAs):
+def reallyMoveToAngleAll(phaseMode,DELAY,Pins,mAs):
     running = True
     bSteps = 0
     a1Steps = 0
@@ -127,6 +142,9 @@ def reallyMoveToAngleAll(b,a1,a2,phaseMode,DELAY,Pins,tAs):
     bPhases = 0
     a1Phases = 0
     a2Phases = 0
+    
+    b,a1,a2 = mAs
+    
     while(running):
         for i in phaseMode:
             for y in Pins:
@@ -160,7 +178,8 @@ def reallyMoveToAngleAll(b,a1,a2,phaseMode,DELAY,Pins,tAs):
         #print("a1Steps: ", a1Steps, a1, math.ceil(a1*1.42222222), a1Done)
         #print("a2Steps: ", a2Steps, a2, math.ceil(a2*1.42222222), a2Done)
         running = not(bDone and a1Done and a2Done)
-    
+
+   
         
     
 def moveToAngleAll(b,a1,a2,phaseMode,DELAY,Pins1,Pins2,Pins3):
@@ -210,7 +229,7 @@ def moveToAngleA2(a2, Pins, phaseMode, DELAY):
     
 while True:
     try:
-        print("Enter 1001 to Quit")
+        print("\nEnter 1001 to Quit\n")
         X = int(input("Enter X coordinate: "))
         Y = int(input("Enter Y coordinate: "))
         Z = int(input("Enter Z coordinate: "))
@@ -218,15 +237,16 @@ while True:
         
         
         if ((X or Y or Z) == 1001):
+            shutdownMotors()
             break
         else:
             #Pins = [Pins1, Pins2, Pins3]
             #reallyMoveToAngleAll(X,Y,Z,FULL,DELAY,Pins)
             
             
-            print("Before:", cAs)
+            print("\nBefore:", cAs)
             cAs = moveToPos(X,Y,Z,FULL,DELAY,Pins1,Pins2,Pins3, cAs)
-            print("After: ",cAs)
+            print("\nAfter: ", cAs)
             #Reverse direction 
             
             #moveToPos(X,Y,Z,FULL_REVERSED,DELAY,Pins1,Pins2,Pins3,cAs)
